@@ -10,12 +10,71 @@
 			text-align: center;
 			font-size: 24px;
 		}
+		.news-item {
+			margin-bottom: 20px;
+			padding-bottom: 10px;
+			border-bottom: 1px solid #ccc;
+		}
+		.news-title {
+			font-size: 18px;
+			font-weight: bold;
+			margin-bottom: 5px;
+		}
+		.news-description {
+			font-size: 14px;
+		}
 	</style>
 </head>
 <body>
 	<div class="banner">
 		This is a test code
 	</div>
-	<!-- Add your content here -->
+	<div id="news"></div>
+	<script>
+		// URL of the RSS feed to fetch
+		var feedUrl = "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml";
+
+		// Function to fetch and parse the RSS feed
+		function fetchFeed() {
+			fetch(feedUrl)
+				.then(response => response.text())
+				.then(data => {
+					// Parse the XML data
+					var parser = new DOMParser();
+					var xml = parser.parseFromString(data, "application/xml");
+
+					// Extract the news items from the XML
+					var items = xml.querySelectorAll("item");
+
+					// Display each news item on the page
+					items.forEach(item => {
+						var title = item.querySelector("title").textContent;
+						var link = item.querySelector("link").textContent;
+						var description = item.querySelector("description").textContent;
+
+						var newsItem = document.createElement("div");
+						newsItem.classList.add("news-item");
+
+						var newsTitle = document.createElement("a");
+						newsTitle.classList.add("news-title");
+						newsTitle.textContent = title;
+						newsTitle.href = link;
+						newsTitle.target = "_blank";
+						newsItem.appendChild(newsTitle);
+
+						var newsDescription = document.createElement("div");
+						newsDescription.classList.add("news-description");
+						newsDescription.innerHTML = description;
+						newsItem.appendChild(newsDescription);
+
+						document.getElementById("news").appendChild(newsItem);
+					});
+				})
+				.catch(error => console.log(error));
+		}
+
+		// Call the fetchFeed function when the page loads
+		window.onload = fetchFeed;
+	</script>
 </body>
 </html>
